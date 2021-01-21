@@ -11,7 +11,7 @@
 #define PIN        6 // On Trinket or Gemma, suggest changing this to 1
 
 // How many NeoPixels are attached to the Arduino?
-#define NUMPIXELS 12 // Popular NeoPixel ring size
+#define NUMPIXELS 16 // Popular NeoPixel ring size
 
 // When setting up the NeoPixel library, we tell it how many pixels,
 // and which pin to use to send signals. Note that for older NeoPixel
@@ -19,7 +19,7 @@
 // strandtest example for more information on possible values.
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
-const int numOfBytes = 36;
+const int numOfBytes = NUMPIXELS * 3;
 char inputBuffer[numOfBytes];
 
 void setup() {
@@ -42,18 +42,21 @@ void loop() {
   if (Serial.available() > 0)
   {
 
-    Serial.readBytes(inputBuffer, numOfBytes);
-    //pixels.clear(); // Set all pixel colors to 'off'
- 
-  for (int i = 0; i < NUMPIXELS; i++) { // For each pixel...
+    int bytesReceived = Serial.readBytes(inputBuffer, numOfBytes);
 
-    // pixels.Color() takes RGB values, from 0,0,0 up to 255,255,255
-    // Here we're using a moderately bright green color:
-   pixels.setPixelColor(i, pixels.Color(inputBuffer[3 * i], inputBuffer[3 * i + 1], inputBuffer[3 * i + 2]));
-    //pixels.setPixelColor(i, pixels.Color(200, 100, 50));
+    if (bytesReceived == numOfBytes) {
+      pixels.clear();
+      for (int i = 0; i < NUMPIXELS; i++) { // For each pixel...
 
-    pixels.show();   // Send the updated pixel colors to the hardware.
+        // pixels.Color() takes RGB values, from 0,0,0 up to 255,255,255
+        // Here we're using a moderately bright green color:
+        pixels.setPixelColor(i, pixels.Color(inputBuffer[3 * i], inputBuffer[3 * i + 1], inputBuffer[3 * i + 2]));
+        //pixels.setPixelColor(i, pixels.Color(200, 100, 50));
+
+
+      }
+      pixels.show();   // Send the updated pixel colors to the hardware.
+    }
   }
- }
 
 }
